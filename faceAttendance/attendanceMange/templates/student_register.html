@@ -1,0 +1,148 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+
+<head> 
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/register.css' %}">
+
+  <meta charset="UTF-8">  
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+<title>Register</title>    
+
+    <meta name="viewport" content="width=device-width, initial-scale=1"> 
+</head>
+
+<body> 
+
+<script type="text/javascript">
+
+  function passwordcheck(form)
+  {
+    if(form.password.value != form.confirmpassword.value)
+    {
+      alert("OOPS....Check your password again!!!");
+      return false;
+    }
+  }
+
+</script>
+   <div>   
+        <form action="student_register" method='post' enctype="multipart/form-data" onsubmit="return passwordcheck(this);"> 
+        {% csrf_token %}   
+            <h4 class="text-warning text-center pt-5">University College of Engineering(Kakatiya University)</h4>
+            <h2 class="text-warning text-center pt-5">STUDENT REGISTRATION</h2>
+
+            {% if messages %}
+              {% for message in messages %}
+                <p style="color:red;"><i>{{message}}</i></p>
+              {% endfor %}
+            {% endif %}  
+    
+            <label>     
+              <input type="text" class="input" name="firstname" placeholder="Your Name" required/>                
+               <div class="line-box">          
+               <div class="line"></div>
+               </div>   
+            </label>
+
+            <label>     
+              <input type="text" class="input" name="lastname" placeholder="Family Name" required/>                
+               <div class="line-box">          
+               <div class="line"></div>
+               </div>   
+            </label>
+
+            <label>     
+              <input type="text" class="input" name="username" placeholder="Username" required/>                
+               <div class="line-box">          
+               <div class="line"></div>
+               </div>   
+            </label>
+            
+            <label>     
+              <input type="text" class="input" name="rollnumber" placeholder="Rollnumber" required/>                
+               <div class="line-box">          
+               <div class="line"></div>
+               </div>   
+            </label>
+
+            <label>
+                <select name="branch" id="branch-select">
+                    <option value="">--Please choose the Branch--</option>
+                    <option value="CSE">CSE</option>
+                    <option value="ECE">ECE</option>
+                    <option value="EEE">EEE</option>
+                    <option value="IT">IT</option>
+                    <option value="MIN">MINING</option>
+                </select>
+            </label>
+
+            <label>     
+              <input type="text" class="input" name="academicyear" placeholder="Academic Year(yyyy-yyyy)" required/>                
+               <div class="line-box">          
+               <div class="line"></div>
+               </div>   
+            </label>
+
+            <label>     
+              <input type="text" class="input" name="mobile" placeholder="Mobile" required/>                
+               <div class="line-box">          
+               <div class="line"></div>
+               </div>   
+            </label>
+            <label>     
+              <input type="text" class="input" name="addressLine1" placeholder="AddressLine1" required/>                
+               <div class="line-box">          
+               <div class="line"></div>
+               </div>   
+            </label>
+
+            <label>     
+              <input type="text" class="input" name="addressLine2" placeholder="AddressLine2" required/>                
+               <div class="line-box">          
+               <div class="line"></div>
+               </div>   
+            </label>
+
+            <label>     
+              <input type="text" class="input" name="city" placeholder="City" required/>                
+               <div class="line-box">          
+               <div class="line"></div>
+               </div>   
+            </label>
+
+            <label>     
+              <input type="text" class="input" name="state" placeholder="State" required/>                
+               <div class="line-box">          
+               <div class="line"></div>
+               </div>   
+            </label>     
+        
+            <label>     
+              <input  type="text" class="input"  name="pincode" placeholder="Pincode" required/>        
+              <div class="line-box">
+              <div class="line"></div>
+              </div>
+            </label>     
+            <label>
+              <input type="password" class="input" name="password" placeholder="Password" required/>        
+            <div class="line-box">          
+            <div class="line"></div>        
+            </div>    
+            </label>
+            <label>
+                <input type="password" class="input" name="confirmpassword" placeholder="Confirm Password" required/>      
+            <div class="line-box">
+            <div class="line"></div>      
+            </div>    
+            </label>
+
+            <label>
+                <input type="file" class="input" name="picture"/>          
+            </label>     
+            <button type="submit" >submit</button>  
+        </form>
+     </div> 
+</body> 
+</html>

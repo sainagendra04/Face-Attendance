@@ -1,0 +1,36 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+
+<head> 
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+
+  <meta charset="UTF-8">  
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+<title>Login</title>    
+
+    <meta name="viewport" content="width=device-width, initial-scale=1"> 
+</head>
+
+<body> 
+   <div>   
+        <form action="manualstaffmarking" method='post'> 
+        {% csrf_token %}   
+            <h2 class="text-warning text-center pt-5">Mark Attendance</h2>  
+            {% if messages %}
+              {% for message in messages %}
+                <p style="color:red;"><i>{{message}}</i></p>
+              {% endfor %}
+            {% endif %}
+            <label>     
+              <input type="text" class="input" name="mobile" placeholder="Mobile" required/>                
+               <div class="line-box">          
+               <div class="line"></div>
+               </div>   
+            </label>        
+            <button type="submit" >Mark Attendance</button>  
+        </form>
+     </div> 
+</body> 
+</html>

@@ -1,0 +1,92 @@
+<html>
+<head>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/details.css' %}">
+</head>
+<body>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    {% comment %} <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/main.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/main.min.js" ></script> {% endcomment %}
+    <link rel="stylesheet" href="{% static 'css/fullcalendar.min.css' %}">
+    <script src="{% static 'js/moment.min.js' %}" ></script> 
+    <script src="{% static 'js/fullcalendar.min.js' %}" ></script> 
+
+    <div style="width:fit-content">
+        <div class="logo">
+            <img src="/static/images/kuce_logo.png" alter="picture">
+        </div>
+        <ul class="nav-area">
+            <li style="color:black";>Welcome <b>{{firstname}}</b></li>
+            <li><a href="logout">Logout</a></li>
+        </ul>
+    </div>
+
+    <div style="width:fit-content">
+        <p>First Name: <b>{{firstname}}</b>
+        User Name:  <b>{{username}}</b>
+        Mobile:  <b>{{mobile}}</b></p>
+        <script>
+             $(document).ready(function() {
+                initializeCalendar();
+            });
+        </script>
+  
+    </div>
+    {% comment %} <div class="">
+        <button type="submit">Get Attendance</button>
+    </div>   {% endcomment %}
+    <div></div>
+    <div style="width:80%;margin:auto;padding-top:2%;padding-bottom:4%">
+        <div id='calendar'></div>
+    </div>
+    <script>
+
+        function initializeCalendar(){
+            $('#calendar').fullCalendar({
+                initialView: 'dayGridMonth',
+                height: 470,
+                width:300,
+                viewRender: function(view, element){
+                    $('#calendar').fullCalendar('removeEvents');
+                    getAttendance(view.intervalStart.format('YYYY-MM-DD'), view.intervalEnd.format('YYYY-MM-DD'));
+                }
+            });
+        }
+
+        function getAttendance(startDate, endDate){
+            debugger;
+            $.ajax({
+                    url: 'getattendance',
+                    type: 'GET',
+                    data: {
+                        start: startDate,
+                        end: endDate
+                    },
+                    success: function(response) {
+                        debugger;
+                        var events = [];
+                        response.map(function(item){
+                            events.push({
+                                title: item[1],
+                                start: item[0],
+                                end: item[0],
+                                backgroundColor: item[1] == 'ABSENT'? '#cc2900' :item[1] == 'PRESENT'?'#3385ff':'#8a4242',
+                                color: item[1] == 'ABSENT'? '#cc2900' :item[1] == 'PRESENT'?'#3385ff':'#8a4242'
+                            });
+                        });
+                        
+                        $('#calendar').fullCalendar('addEventSource', events);
+                    },
+                    error: function(){
+                        debugger;
+                    }
+                    
+                });
+        }
+
+        //$(document).ready(function() {
+        //    initializeCalendar();
+        //});       
+    </script>
+</body>
+</html>

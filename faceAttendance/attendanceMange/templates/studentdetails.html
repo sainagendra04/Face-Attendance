@@ -1,0 +1,39 @@
+<html>
+<head>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/details.css' %}">
+</head>
+<body>
+<form action="studentattendance">
+<header>
+
+<div style="wrapper">
+<div class="logo">
+    <img src="/static/images/kuce_logo.png" alter="picture">
+</div>
+<ul class="nav-area">
+<li style="color:black";>Welcome <b>{{firstname}}</b></li>
+<li><a href="logout">Logout</a></li>
+</ul>
+</div>
+<div class="welcome-text">
+    <p>First Name:  <b>{{firstname}}</b></p>
+    <p>Last Name:  <b>{{lastname}}</b></p>
+    <p>User Name:  <b>{{username}}</b></p>
+    <p>Designation: <b>{{designation}}</b></p>
+    <p>Hallticket:  <b>{{hallticket}}</b></p>
+    <p>Stream:  <b>{{stream}}</b></p>
+    <p>Mobile:  <b>{{mobile}}</b></p> 
+    <p>City:  <b>{{address}}</b></p>   
+</div>
+<div class="profileimg">
+        <img src="{{propic}}" alter="picture">
+</div>
+<div class="btn">
+    <button type="submit">Get Attendance</button>
+</div>  
+</form>
+</header>
+<body>
+
+</html>

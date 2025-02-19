@@ -1,0 +1,187 @@
+<html>
+<head>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/attendance.css' %}">
+    
+</head>
+<body>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    {% comment %} <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/main.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/main.min.js" ></script> {% endcomment %}
+
+    <link rel="stylesheet" href="{% static 'css/fullcalendar.min.css' %}">
+    <script src="{% static 'js/moment.min.js' %}" ></script> 
+    <script src="{% static 'js/fullcalendar.min.js' %}" ></script> 
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <div style="wrapper">
+        <div class="logo">
+            <img src="/static/images/kuce_logo.png" alter="picture">
+        </div>
+        <ul class="nav-area">
+            <li><a href="manualstaffmarking">Mark staff Attendance</a></li>
+            <li><a href="logout">Logout</a></li>
+        </ul>
+    </div>
+
+    <div style="padding-top:9%">
+        <p>First Name: <b>{{firstname}}</b>
+        User Name:  <b>{{username}}</b>
+        Mobile:  <b>{{mobile}}</b></p>
+    </div>
+  <div class="wrapper">
+    <div class="buttonWrapper">
+      <button class="tab-button active" style="border-top-left-radius: 10px;" data-id="myattendance">My Attendance</button>
+      <button class="tab-button" data-id="staffattendance">Staff Attendance</button>
+    </div>
+    <div class="contentWrapper">
+      <div class="content active" id="myattendance">
+        <div style="width:80%;margin:auto;padding-top:2%;padding-bottom:4%">
+                <div id='calendar'></div>
+        </div>
+      </div>
+      
+      <div class="content" id="staffattendance">
+        
+          <label for="staffSelect">Select Staff :</label>
+
+          <select style='width:250px' id='staffSelect'>
+            <option id="0">-SELECT-</option>
+          </select>
+
+          <div style="width:80%;margin:auto;padding-top:2%;padding-bottom:4%" id="divStaffCalendar">
+                <div id='staffCalendar'></div>
+        </div>
+      </div>
+    </div>
+  </div>
+    {% comment %} <div class="">
+        <button type="submit">Get Attendance</button>
+    </div>   {% endcomment %}
+    <div></div>
+    <div style="width:80%;margin:auto;padding-top:2%;padding-bottom:4%">
+        <div id='calendar'></div>
+    </div>
+    <script>
+
+        const tabs = document.querySelector(".wrapper");
+        const tabButton = document.querySelectorAll(".tab-button");
+        const contents = document.querySelectorAll(".content");
+
+        tabs.onclick = e => {
+          const id = e.target.dataset.id;
+          if (id) {
+            tabButton.forEach(btn => {
+              btn.classList.remove("active");
+            });
+            e.target.classList.add("active");
+
+            contents.forEach(content => {
+              content.classList.remove("active");
+            });
+            const element = document.getElementById(id);
+            element.classList.add("active");
+          }
+        }
+
+        function initializeCalendar(){
+            $('#calendar').fullCalendar({
+                initialView: 'dayGridMonth',
+                height: 470,
+                width:300,
+                viewRender: function(view, element){
+                    $('#calendar').fullCalendar('removeEvents');
+                    getAttendance(view.intervalStart.format('YYYY-MM-DD'), view.intervalEnd.format('YYYY-MM-DD'), 0);
+                }
+            });
+        }
+        function initializeStaffCalendar(staffUserId){
+          $('#staffCalendar').fullCalendar('destroy');
+            $('#staffCalendar').fullCalendar({
+                initialView: 'dayGridMonth',
+                height: 470,
+                width:300,
+                viewRender: function(view, element){
+                    $('#staffCalendar').fullCalendar('removeEvents');
+                    getAttendance(view.intervalStart.format('YYYY-MM-DD'), view.intervalEnd.format('YYYY-MM-DD'), staffUserId);
+                }
+            });
+        }
+
+        function getAttendance(startDate, endDate, staffUserId){
+            var dataParam;
+            if(staffUserId > 0) 
+              dataParam = {
+                id: staffUserId,
+                start: startDate,
+                end: endDate }
+            else
+              dataParam = {
+                start: startDate,
+                end: endDate }
+            var dataParam = 
+            $.ajax({
+                    url: "getstaffattendance",
+                    type: 'GET',
+                    data: dataParam,
+                    success: function(response) {
+                        var events = [];
+                        response.map(function(item){
+                            events.push({
+                                title: item[1],
+                                start: item[0],
+                                end: item[0],
+                                backgroundColor: item[1] == 'ABSENT'? '#cc2900' :item[1] == 'PRESENT'?'#3385ff':'#8a4242',
+                                color: item[1] == 'ABSENT'? '#cc2900' :item[1] == 'PRESENT'?'#3385ff':'#8a4242'
+                            });
+                        });
+                        
+                        if(staffUserId > 0) $('#staffCalendar').fullCalendar('addEventSource', events);
+                        else $('#calendar').fullCalendar('addEventSource', events);
+                    },
+                    error: function(e){
+                        debugger;
+                    }
+                    
+                });
+        }
+
+        function getAllStaff(){
+            debugger;
+            $.ajax({
+                url: 'getmystaff',
+                type: 'GET',
+                success: function(response){
+                    debugger;
+                    var staffs = [];
+                    response.map(function(item){
+                            staffs.push({
+                                id: item.id,
+                                text: item.staffname
+                            });
+                        });
+                    $("#staffSelect").select2({
+                      placeholder: " - SELECT - ",
+                      data: staffs });
+                },
+                error: function(e){}
+            });
+        }
+
+        $(document).ready(function() {
+            initializeCalendar();
+            getAllStaff();
+            
+            $('#staffSelect').on('select2:select', function(e) {
+              var staff = e.params.data;
+              if(staff.id > 0){
+                $('#divStaffCalendar').show();
+                initializeStaffCalendar(staff.id);
+              }
+              else $('#divStaffCalendar').hide();
+            });
+        });     
+    </script>
+</body>
+</html>

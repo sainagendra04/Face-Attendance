@@ -1,0 +1,207 @@
+<html>
+<head>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/attendance.css' %}">
+    
+</head>
+<body>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    {% comment %} <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/main.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/main.min.js" ></script> {% endcomment %}
+
+    <link rel="stylesheet" href="{% static 'css/fullcalendar.min.css' %}">
+    <script src="{% static 'js/moment.min.js' %}" ></script> 
+    <script src="{% static 'js/fullcalendar.min.js' %}" ></script> 
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <div style="wrapper">
+        <div class="logo">
+            <img src="/static/images/kuce_logo.png" alter="picture">
+        </div>
+
+        <ul class="nav-area">
+            <li><a href="manualstudentmarking">Mark student Attendance</a></li>
+            <li><a href="logout">Logout</a></li>
+        </ul>
+
+    </div>
+
+    <div style="padding-top:9%">
+        <p>First Name: <b>{{firstname}}</b>
+        User Name:  <b>{{username}}</b>
+        Mobile:  <b>{{mobile}}</b></p>
+    </div>
+  <div class="wrapper">
+    <div class="buttonWrapper">
+      <button class="tab-button active" style="border-top-left-radius: 10px;" data-id="myatendance">My Attendance</button>
+      <button class="tab-button" data-id="studentattendance">Student Attendance</button>
+    </div>
+    <div class="contentWrapper">
+      <div class="content active" id="myatendance">
+        <div style="width:80%;margin:auto;padding-top:2%;padding-bottom:4%">
+                <div id='calendar'></div>
+        </div>
+      </div>
+      
+      <div class="content" id="studentattendance">
+        <label for="branch">Choose a Branch:</label>
+      
+        <select style='width:150px' id='branch'>
+          <option value='0'>-SELECT-</option>
+        </select>
+        <div class='' id='studentDiv' style="margin-top:10px;">
+          <label for="studentSelect">Select Student:</label>
+
+          <select style='width:250px' id='studentSelect'>
+          </select>
+
+          <div style="width:80%;margin:auto;padding-top:2%;padding-bottom:4%" id="divStdCalendar">
+                <div id='stdCalendar'></div>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+    {% comment %} <div class="">
+        <button type="submit">Get Attendance</button>
+    </div>   {% endcomment %}
+    <div></div>
+    <div style="width:80%;margin:auto;padding-top:2%;padding-bottom:4%">
+        <div id='calendar'></div>
+    </div>
+    <script>
+
+        const tabs = document.querySelector(".wrapper");
+        const tabButton = document.querySelectorAll(".tab-button");
+        const contents = document.querySelectorAll(".content");
+
+        tabs.onclick = e => {
+          const id = e.target.dataset.id;
+          if (id) {
+            tabButton.forEach(btn => {
+              btn.classList.remove("active");
+            });
+            e.target.classList.add("active");
+
+            contents.forEach(content => {
+              content.classList.remove("active");
+            });
+            const element = document.getElementById(id);
+            element.classList.add("active");
+          }
+        }
+
+        function initializeCalendar(){
+            $('#calendar').fullCalendar({
+                initialView: 'dayGridMonth',
+                height: 470,
+                width:300,
+                viewRender: function(view, element){
+                    $('#calendar').fullCalendar('removeEvents');
+                    getAttendance(view.intervalStart.format('YYYY-MM-DD'), view.intervalEnd.format('YYYY-MM-DD'), 0);
+                }
+            });
+        }
+        function initializeStudentCalendar(studentUserId){
+          $('#stdCalendar').fullCalendar('destroy');
+            $('#stdCalendar').fullCalendar({
+                initialView: 'dayGridMonth',
+                height: 470,
+                width:300,
+                viewRender: function(view, element){
+                    $('#stdCalendar').fullCalendar('removeEvents');
+                    getAttendance(view.intervalStart.format('YYYY-MM-DD'), view.intervalEnd.format('YYYY-MM-DD'), studentUserId);
+                }
+            });
+        }
+
+        function getAttendance(startDate, endDate, studentUserId){
+            debugger;
+            var urlParam = studentUserId > 0? 'getstudentattendance':'getstaffattendance';
+            var dataParam;
+            if(studentUserId > 0) 
+              dataParam = {
+                id: studentUserId,
+                start: startDate,
+                end: endDate }
+            else
+              dataParam = {
+                start: startDate,
+                end: endDate }
+            var dataParam = 
+            $.ajax({
+                    url: urlParam,
+                    type: 'GET',
+                    data: dataParam,
+                    success: function(response) {
+                        debugger;
+                        var events = [];
+                        response.map(function(item){
+                            events.push({
+                                title: item[1],
+                                start: item[0],
+                                end: item[0],
+                                backgroundColor: item[1] == 'ABSENT'? '#cc2900' :item[1] == 'PRESENT'?'#3385ff':'#8a4242',
+                                color: item[1] == 'ABSENT'? '#cc2900' :item[1] == 'PRESENT'?'#3385ff':'#8a4242'
+                            });
+                        });
+                        
+                        if(studentUserId > 0) $('#stdCalendar').fullCalendar('addEventSource', events);
+                        else $('#calendar').fullCalendar('addEventSource', events);
+                    },
+                    error: function(e){
+                        debugger;
+                    }
+                    
+                });
+        }
+
+        $(document).ready(function() {
+            $('#studentDiv').hide();
+            initializeCalendar();
+            var stream = [{id:1, text:"CSE"},{id:2, text:"ECE"},{id:3, text:"EEE"},{id:4, text:"IT"},{id:5, text:"MINING"}];
+            $("#branch").select2({
+              placeholder: " - SELECT - ",
+              data: stream
+            });
+            $("#studentSelect").val(null).trigger('change');
+            $('#branch').on('select2:select', function(e) {
+              $('#divStdCalendar').hide();
+              var branch = e.params.data;
+              if(branch.id > 0){
+                $('#studentDiv').show();
+                $.ajax({
+                  url: 'getstudentsbybranch',
+                  type: 'GET',
+                  data: {id : branch.id},
+                  success: function(response) {
+                    $("#studentSelect").empty();
+                    var students = [];
+                    response.map(function(item){
+                            students.push({
+                                id: item[0],
+                                text: item[1]
+                            });
+                        });
+                    $("#studentSelect").select2({
+                      placeholder: " - SELECT - ",
+                      data: students });
+                    $("#studentSelect").val(null).trigger('change');
+                  }
+                });
+              }else $('#studentDiv').hide();
+            });
+
+            $('#studentSelect').on('select2:select', function(e) {
+              var student = e.params.data;
+              if(student.id > 0){
+                $('#divStdCalendar').show();
+                initializeStudentCalendar(student.id);
+              }
+              else $('#divStdCalendar').hide();
+            });
+        });     
+    </script>
+</body>
+</html>

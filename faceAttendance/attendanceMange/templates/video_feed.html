@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <style type="text/css">
+        #videoelement{
+            width: 720px,
+            height:480px
+            }
+    </style>
+    <video id="videoelement" autoplay="true"></video>
+    <a href="log_in" target="blank">Login</a>
+    <script type="text/javascript">
+    var video = document.querySelector("#videoelement")
+    navigator.getUserMedia = navigator.getUserMedia|| navigator.webkitGetUsermedia||navigator.mozGetUserMedia||navigator.msGetUsermedia||navigator.mozGetUserMedia
+    if (navigator.getUserMedia){
+        navigator.getUserMedia({video:true},handleVideo,videoError);
+
+    }
+    function handleVideo(stream){
+        video.srcObject=stream;
+    }
+    function videoError(e){
+
+    }
+    </script>
+
+</body>
+</html>
